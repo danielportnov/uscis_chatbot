@@ -13,8 +13,9 @@ embed = OllamaEmbeddings(
     model="llama3.1:8b"
 )
 
-def generate_embedding(text):
-    return text, embed.embed_query(text)
+def generate_embedding(document):
+    text = document.page_content
+    return document, embed.embed_query(text)
 
 async def generate_embeddings_async(dataloader):
     total_items = len(dataloader)
