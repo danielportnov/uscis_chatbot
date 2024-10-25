@@ -17,17 +17,21 @@ def get_text_from_url(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
 
-    # remove all script and style elements
-    for script in soup(["script", "style"]):
-        script.decompose()
-    
-    clean_text = soup.get_text()
+    content = {}
 
-    # remove whitespace and newlines
-    clean_text = re.sub(r'\s+', ' ', clean_text)
-    clean_text = clean_text.strip()
+    def get_text_after_header(header_tag):
+        text = []
+        for sibling in header_tag.find_next_siblings():
+            if sibling.name and sibling.name.startswith('h'):  # Stop at the next header (h1, h2, etc.)
+                break
+            text.append(sibling.get_text())
+        return " ".join(text)
 
-    return clean_text
+    for header in soup.find_all(['h1', 'h2', 'h3']):
+        header_text = header.get_text()
+        content[header_text] = get_text_after_header(header)
+
+    return content
 
 def batch_text(text, batch_size=1000):
     return [text[i:i+batch_size] for i in range(0, len(text), batch_size)]

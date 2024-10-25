@@ -14,7 +14,7 @@ embed = OllamaEmbeddings(
 )
 
 def generate_embedding(text):
-    return (text, embed.embed_query(text))
+    return text, embed.embed_query(text)
 
 async def generate_embeddings_async(dataloader):
     total_items = len(dataloader)
