@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
-import re
 import torch
+from langchain_text_splitters import HTMLHeaderTextSplitter
 
 class TextDataset(torch.utils.data.Dataset):
     def __init__(self, batched_text):
@@ -35,3 +35,15 @@ def get_text_from_url(url):
 
 def batch_text(text, batch_size=1000):
     return [text[i:i+batch_size] for i in range(0, len(text), batch_size)]
+
+def langchain_text_splitter(url):
+    headers_to_split_on = [
+        ("h1", "Header 1"),
+        ("h2", "Header 2"),
+        ("h3", "Header 3"),
+    ]
+
+    html_splitter = HTMLHeaderTextSplitter(headers_to_split_on=headers_to_split_on)
+    html_header_splits = html_splitter.split_text_from_url(url)
+
+    return html_header_splits
