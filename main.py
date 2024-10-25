@@ -1,7 +1,9 @@
-from langchain.llms import Ollama
-from langchain.vectorstores import FAISS
-from langchain.embeddings import OllamaEmbeddings
+import text_tools
+import llm_tools
 
-llm = Ollama(model="llama3.1:8b")
+url = 'https://www.uscis.gov/book/export/html/68600'
 
-print(llm("Hello, how are you?"))
+text = text_tools.get_text_from_url(url)
+# TODO: finish project with 3 batches... to know it works
+batched_text = text_tools.batch_text(text)
+embeddings = llm_tools.generate_embeddings(batched_text)

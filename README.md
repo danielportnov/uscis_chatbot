@@ -19,7 +19,7 @@ install ollama (if not already installed)
 conda install -c conda-forge ollama
 ```
 
-pull the ollama docker image
+pull the ollama model
 ```bash
 ollama pull llama3.1:8b  
 ```
