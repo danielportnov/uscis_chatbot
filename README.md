@@ -8,7 +8,7 @@ Chatbot which answers questions about the USCIS application process.
 - conda (or other environment manager)
 - Pinecone API key in `.env` file
 - Ollama installed and running locally
-    - You can download it [here](https://ollama.com/download).
+    - You can download it at: https://ollama.com/download.
 
 ## Setup
 
