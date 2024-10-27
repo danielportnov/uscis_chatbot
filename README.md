@@ -52,3 +52,7 @@ To run the chatbot run the following command:
 ```bash
 streamlit run chatbot_ui.py
 ```
+
+## Troubleshooting
+
+- If you get a "connection refused" error when running the chatbot, it is likely because Ollama is not running. Check that Ollama is running locally.

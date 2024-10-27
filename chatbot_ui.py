@@ -3,13 +3,16 @@ import streamlit as st
 from streamlit_chat import message
 from langchain_ollama.llms import OllamaLLM
 import tools
-from setup_chatbot_ui import setup_chatbot
 
 warnings.filterwarnings("ignore")
 
 @st.cache_resource
 def setup_chatbot_ui():
-    return setup_chatbot()
+    llm = OllamaLLM(model="llama3.1:8b")
+    url = 'https://www.uscis.gov/book/export/html/68600'
+    text_splits = tools.langchain_text_splitter(url)
+
+    return llm, text_splits
 
 llm, text_splits = setup_chatbot_ui()
 
