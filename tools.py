@@ -52,6 +52,10 @@ def generate_embedding(document):
     text = document.page_content
     return document, embeddings.embed_query(text)
 
+# generates embedding for a query
+def generate_query_embedding(query):
+    return embeddings.embed_query(query)
+
 # PINECONE TOOLS
 
 # creates a pinecone index (does not check if index already exists)
@@ -82,6 +86,16 @@ def load_embeddings_into_pinecone(text_splits, index_name, namespace):
         vectors = [{"id": document_hash, "values": embedding, "metadata": document.metadata if document.metadata else {}}]
         index.upsert(vectors, namespace=namespace)
 
+def get_context_from_document_ids(document_ids, db_name='hashed_text_splits.db'):
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT * FROM hashed_text_splits WHERE hash IN ({})
+    '''.format(', '.join(['?'] * len(document_ids))), document_ids)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
 # LLM TOOLS
 
 # returns a vector store for a pinecone index
@@ -96,6 +110,22 @@ def get_retrieval_chain(vector_store):
     retriever = vector_store.as_retriever()
     combine_documents_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     return create_retrieval_chain(retriever, combine_documents_chain)
+
+# returns a list of document ids from a query
+def get_document_ids_from_query(index_name, namespace, query):
+    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    index = pc.Index(index_name)
+    results = index.query(namespace=namespace, vector=generate_query_embedding(query), top_k=20, include_values=True, include_metadata=True, include_text=False)
+    return [res["id"] for res in results["matches"]]
+
+# returns a prompt for the LLM
+def get_prompt(context, query):
+    context_str = ''
+    for c in context:
+        context_str += c[1]
+        context_str += " " + "METADATA: " + str(c[2]) + "\n\n"
+    prompt = f"Context: {context_str}\nQuery: {query}"
+    return prompt
 
 # DATABASE TOOLS
 
@@ -123,11 +153,6 @@ def write_hashed_text_splits_to_db(hashed_text_splits, db_name='hashed_text_spli
     # Commit the transaction and close the connection
     conn.commit()
     conn.close()
-
-
-
-
-
 
 # async def generate_embeddings_async(dataloader):
 #     total_items = len(dataloader)
