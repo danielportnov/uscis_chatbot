@@ -10,7 +10,11 @@ from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 import sqlite3
+from dotenv import load_dotenv
 
+load_dotenv()
+
+PINECONE_API_KEY = os.getenv("PINECONE_API_KEY")
 llm = OllamaLLM(model="llama3.1:8b")
 embeddings = OllamaEmbeddings(model="llama3.1:8b")
 
@@ -60,7 +64,7 @@ def generate_query_embedding(query):
 
 # creates a pinecone index (does not check if index already exists)
 def create_pinecone_index(index_name):
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=PINECONE_API_KEY)
 
     pc.create_index(
         name=index_name,
@@ -76,7 +80,7 @@ def create_pinecone_index(index_name):
 
 # load embeddings into pinecone index
 def load_embeddings_into_pinecone(text_splits, index_name, namespace):
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=PINECONE_API_KEY)
     index = pc.Index(index_name)
 
     for i, document in enumerate(text_splits):
@@ -100,7 +104,7 @@ def get_context_from_document_ids(document_ids, db_name='hashed_text_splits.db')
 
 # returns a vector store for a pinecone index
 def get_vector_store(index_name, namespace):
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=PINECONE_API_KEY)
     index = pc.Index(index_name)
     return PineconeVectorStore(index, embeddings, namespace=namespace)
 
@@ -113,7 +117,7 @@ def get_retrieval_chain(vector_store):
 
 # returns a list of document ids from a query
 def get_document_ids_from_query(index_name, namespace, query):
-    pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+    pc = Pinecone(api_key=PINECONE_API_KEY)
     index = pc.Index(index_name)
     results = index.query(namespace=namespace, vector=generate_query_embedding(query), top_k=20, include_values=True, include_metadata=True, include_text=False)
     return [res["id"] for res in results["matches"]]
@@ -217,7 +221,7 @@ def write_hashed_text_splits_to_db(hashed_text_splits, db_name='hashed_text_spli
 #     model="llama3.1:8b"
 # )
 
-# pc = Pinecone(api_key=os.getenv("PINECONE_API_KEY"))
+# pc = Pinecone(api_key=PINECONE_API_KEY)
 
 # index_name = "embedding-test"
 
