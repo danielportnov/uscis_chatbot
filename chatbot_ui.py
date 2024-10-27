@@ -7,18 +7,22 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 
 # Function to generate a response (placeholder)
+# def get_bot_response(user_input):
+#     responses = [
+#         "That's interesting! Tell me more.",
+#         "I see. How does that make you feel?",
+#         "Can you elaborate on that?",
+#         "Interesting perspective. What led you to think that?",
+#         "I understand. Is there anything else on your mind?"
+#     ]
+#     return random.choice(responses)
+
 def get_bot_response(user_input):
-    responses = [
-        "That's interesting! Tell me more.",
-        "I see. How does that make you feel?",
-        "Can you elaborate on that?",
-        "Interesting perspective. What led you to think that?",
-        "I understand. Is there anything else on your mind?"
-    ]
-    return random.choice(responses)
+    pass
+
 
 # Streamlit UI
-st.title("Simple Chatbot")
+st.title("USCIS Chatbot")
 
 # User input
 user_input = st.text_input("You:", key="user_input")

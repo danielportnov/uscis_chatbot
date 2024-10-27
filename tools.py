@@ -9,8 +9,7 @@ from pinecone import Pinecone, ServerlessSpec
 from langchain import hub
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
-
-# logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+import sqlite3
 
 llm = OllamaLLM(model="llama3.1:8b")
 embeddings = OllamaEmbeddings(model="llama3.1:8b")
@@ -69,7 +68,7 @@ def create_pinecone_index(index_name):
         ) 
     )
 
-    logging.info(f"Index {index_name} created")
+    print(f"Index {index_name} created")
 
 # load embeddings into pinecone index
 def load_embeddings_into_pinecone(text_splits, index_name, namespace):
@@ -77,10 +76,9 @@ def load_embeddings_into_pinecone(text_splits, index_name, namespace):
     index = pc.Index(index_name)
 
     for i, document in enumerate(text_splits):
-        logging.info(f"Processing document {i+1} of {len(text_splits)}")
+        print(f"Processing document {i+1} of {len(text_splits)}")
         document_hash = create_document_hash(document)
         document, embedding = generate_embedding(document)
-        document.metadata['text'] = document.page_content
         vectors = [{"id": document_hash, "values": embedding, "metadata": document.metadata if document.metadata else {}}]
         index.upsert(vectors, namespace=namespace)
 
@@ -99,7 +97,32 @@ def get_retrieval_chain(vector_store):
     combine_documents_chain = create_stuff_documents_chain(llm, retrieval_qa_chat_prompt)
     return create_retrieval_chain(retriever, combine_documents_chain)
 
+# DATABASE TOOLS
 
+def write_hashed_text_splits_to_db(hashed_text_splits, db_name='hashed_text_splits.db'):
+    # Connect to SQLite database (or create it if it doesn't exist)
+    conn = sqlite3.connect(db_name)
+    cursor = conn.cursor()
+
+    # Create a table to store the hashed text splits
+    cursor.execute('''
+    CREATE TABLE IF NOT EXISTS hashed_text_splits (
+        hash TEXT PRIMARY KEY,
+        page_content TEXT,
+        metadata TEXT
+    )
+    ''')
+
+    # Insert hashed text splits into the table
+    for hash_value, document in hashed_text_splits.items():
+        cursor.execute('''
+        INSERT OR REPLACE INTO hashed_text_splits (hash, page_content, metadata)
+        VALUES (?, ?, ?)
+        ''', (hash_value, document.page_content, str(document.metadata)))
+
+    # Commit the transaction and close the connection
+    conn.commit()
+    conn.close()
 
 
 

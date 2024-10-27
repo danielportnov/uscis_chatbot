@@ -15,10 +15,10 @@ text_splits = tools.langchain_text_splitter(url)
 
 # load embeddings into pinecone index
 index_name = "uscis-embeddings"
-namespace = "uscis-policy-manual-with-text"
+namespace = "uscis-policy-manual"
 
-tools.create_pinecone_index(index_name)
-# tools.load_embeddings_into_pinecone(text_splits[300:], index_name, namespace)
+# tools.create_pinecone_index(index_name)
+# tools.load_embeddings_into_pinecone(text_splits, index_name, namespace)
 
 # vector_store = tools.get_vector_store(index_name, namespace)
 # retrieval_chain = tools.get_retrieval_chain(vector_store)
