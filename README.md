@@ -22,6 +22,13 @@ install the dependencies
 pip install -r requirements.txt
 ```
 
+### Adding the Pinecone API Key
+
+Create a `.env` file in the root directory and add the following:
+```
+PINECONE_API_KEY=<your_pinecone_api_key>
+```
+
 ### Getting Ollama Running
 
 ensure that ollama is running locally
@@ -57,3 +64,4 @@ streamlit run chatbot_ui.py
 ## Troubleshooting
 
 - If you get a "connection refused" error when running the chatbot, it is likely because Ollama is not running. Check that Ollama is running locally.
+- If you get an error about the pinecone API key, ensure that you have added the API key to the `.env` file.
