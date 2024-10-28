@@ -30,12 +30,13 @@ ensure that ollama is running locally
 
 ```bash
 Usage:
+  ollama [flags]
   ollama [command]
 
 Available Commands:
-  completion  Generate the autocompletion script for the specified shell
-  help        Help about any command
-  pull        Pull a model from the model registry
+  serve       Start ollama
+  create      Create a model from a Modelfile
+  show        Show information for a model
   run         Run a model
 ```
 
